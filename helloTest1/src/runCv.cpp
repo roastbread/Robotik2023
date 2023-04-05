@@ -61,7 +61,7 @@ Mat colorSegmentation(Mat frame, int minHue = 90, int maxHue = 120){
 	Mat frame_threshold, imHSV;
 	Mat kernel = (Mat_<unsigned char>(3,3) <<  0, 1, 0, 1, 1, 1, 0, 1, 0);
 	cvtColor(frame, imHSV, COLOR_BGR2HSV);
-	inRange(imHSV, Scalar(minHue, 50, 0), Scalar(maxHue, 255, 255), frame_threshold);
+	inRange(imHSV, Scalar(minHue, 50, 50), Scalar(maxHue, 230, 230), frame_threshold);
 	morphologyEx(frame_threshold, frame_threshold, cv::MORPH_OPEN, kernel, Point(-1,-1), 5);
 	return frame_threshold;
 }
@@ -90,7 +90,7 @@ int trackBox(Mat frame_threshold){
 					static_cast<float>(mu[index].m01 / (mu[index].m00 + 1e-5)) );
 		circle( frame_threshold, mc[0], 4, Scalar(100, 200, 0), -1 );
 
-		posX = static_cast<int>(mc[0].x) - 1280/2;
+		posX = static_cast<int>(mc[0].x) - 640/2;
 	}
 	return posX;
 }
