@@ -95,7 +95,7 @@ int trackBox(Mat frame_threshold){
 	return posX;
 }
 
-int main(int, char**) {
+int maintttt(int, char**) {
 	Mat frame, frame_threshold;
 	VideoCapture cap = initCamera();
 	for(;;){
