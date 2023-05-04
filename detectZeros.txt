@@ -1,0 +1,186 @@
+****************************************************************************************************************************************
+*																		*
+*         DETECTING IF IT'S A '0' OR A '1' ON THE BLUE BLOCKS									        *
+*																		*
+****************************************************************************************************************************************
+ * NOTE: 0 == Ellipse, not circular
+ * Combine multiple methods below in order to minimize misinterpretations of a zero?
+****************************************************************************************************************************************
+ * Suggestion (1)
+ *
+ * 1. Take a frame capture
+ * 2. Find object
+ * 3. Resize:
+ *          int down_width = 300;
+            int down_height = 200;
+            Mat resized_down;
+            resize(image, resized_down, Size(down_width, down_height), INTER_LINEAR);
+ * 4.       int cv::countNonZero() ? ratio?
+ *
+****************************************************************************************************************************************
+ * Suggestion (2)
+ *
+ * 1. Take a frame capture
+ * 2. Find object
+ * 3. Resize
+ * 4. Look after black pixels surrounded by white pixels ? ratio? LEFT-RIGHT-DOWN?
+ * 5. Look at the third fourth from above and check after WHITE--BLACK--WHITE
+ *
+****************************************************************************************************************************************
+ * Suggestion (3)
+ *
+ * 1. A lot of people using knn. However it is machine learning. There has to be an easier solution for a simple task like this
+ *
+****************************************************************************************************************************************
+ * Suggestion (4)
+ *
+ * Calculate the amount of blue color on the boxes, try finding what differs
+ *
+****************************************************************************************************************************************
+ * Suggestion (5)
+ *
+ *  "opencv can you detect the digit 0 by looking or circles?"
+ *  Try to recognize geometry for the '0', namely possible circles?
+ *  1. extract the digit
+ *  2. find circles with the Hough Circle Transform algorithm, if it finds a circle it is most likely to be a zero, if not, it's a '0'
+ *  https://docs.opencv.org/3.4/d4/d70/tutorial_hough_circle.html
+ *  use the cv2.HoughCircles() function with the cv2.HOUGH_GRADIENT method to detect ellipses by
+ *  setting the minRadius and maxRadius parameters to be different for the horizontal and vertical axes of the ellipse.
+ *
+****************************************************************************************************************************************
+ * Suggestion (6)
+ *
+ * Code: 1 || 2 below
+ * the code captures frames from the camera and applies thresholding to create a binary image.
+ * It then applies edge detection to find the contours of the digits in the image, and computes the circularity of each contour.
+ * If the circularity is above a certain threshold (in this case, 0.8), the contour is assumed to be a zero and a bounding box is drawn around it.
+ *
+****************************************************************************************************************************************v
+ * Problems:
+ *
+ * if we see the box from the diagonal, so we see 2 numbers etc.
+ * Which angle will the Camera see the box from? i.e vertically.
+ *
+****************************************************************************************************************************************
+# Code (1)
+****************************************************************************************************************************************
+
+#include <opencv2/opencv.hpp>
+#include <iostream>
+#include <vector>
+
+using namespace cv;
+using namespace std;
+
+int main() {
+    // Create a video capture object to read from the camera
+    VideoCapture cap(0);
+
+    while (true) {
+        // Read a frame from the camera
+        Mat frame;
+        cap >> frame;
+
+        // Convert the frame to grayscale
+        Mat gray;
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+        // Apply thresholding to create a binary image
+        Mat binary;
+        threshold(gray, binary, 127, 255, THRESH_BINARY);
+
+        // Apply edge detection to find the contours of the digits
+        Mat edges;
+        Canny(binary, edges, 100, 200);
+
+        // Find the contours in the edge map
+        vector<vector<Point>> contours;
+        vector<Vec4i> hierarchy;
+        findContours(edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+        // Loop over the contours to find the zero
+        for (auto const &cnt : contours) {
+            // Find the area and perimeter of the contour
+            double area = contourArea(cnt);
+            double perimeter = arcLength(cnt, true);
+
+            // Compute the circularity of the contour
+            double circularity = 4 * M_PI * area / (perimeter * perimeter);
+
+            // If the contour is a zero, draw a bounding box around it
+            if (circularity > 0.8) {
+                Rect boundingRect = boundingRect(cnt);
+                rectangle(frame, boundingRect, Scalar(0, 255, 0), 2);
+            }
+        }
+
+        // Display the frame
+        imshow("Zero Detection", frame);
+
+        // Exit the program if the 'q' key is pressed
+        if (waitKey(1) == 'q') {
+            break;
+        }
+    }
+
+    // Release the capture object and close all windows
+    cap.release();
+    destroyAllWindows();
+
+    return 0;
+}
+
+****************************************************************************************************************************************
+# Code (2)
+****************************************************************************************************************************************
+
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+
+int main() {
+    // Create a video capture object to read from the camera
+    VideoCapture cap(0);
+
+    while (waitKey(1) != 'q') {
+        // Read a frame from the camera
+        Mat frame;
+        cap >> frame;
+
+        // Convert the frame to grayscale
+        cvtColor(frame, frame, COLOR_BGR2GRAY);
+
+        // Apply thresholding to create a binary image
+        threshold(frame, frame, 127, 255, THRESH_BINARY);
+
+        // Find the contours of the digits
+        std::vector<std::vector<Point>> contours;
+        findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+        // Loop over the contours to find the zero
+        for (const auto& cnt : contours) {
+            // Compute the area and perimeter of the contour
+            double area = contourArea(cnt);
+            double perimeter = arcLength(cnt, true);
+
+            // Compute the circularity of the contour
+            double circularity = 4 * M_PI * area / (perimeter * perimeter);
+
+            // If the contour is a zero, draw a bounding box around it
+            if (circularity > 0.8) {
+                Rect bbox = boundingRect(cnt);
+                rectangle(frame, bbox, Scalar(0, 255, 0), 2);
+            }
+        }
+
+        // Display the frame
+        imshow("Zero Detection", frame);
+    }
+
+    // Release the capture object and close all windows
+    cap.release();
+    destroyAllWindows();
+
+    return 0;
+}
+****************************************************************************************************************************************
