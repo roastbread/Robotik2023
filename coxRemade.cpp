@@ -33,6 +33,7 @@ class coxMap{
 	//double sensorPose[] = {1000000,20000000,3000000};
 	Eigen::MatrixXd x;
 	Eigen::MatrixXd y;
+    MatrixXd covariance;
 
 	//double sensorPose[3] = {660 ,0,-90*M_PI/180};
 	double sensorPose[3] = {0, 0, 0};
