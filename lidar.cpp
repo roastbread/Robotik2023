@@ -76,7 +76,7 @@ void lidarRead(void) {
 				if (Array_full_flag == 0){
 					if(iQuality == 15 && iDistance != 0){
 						DIS(0, Index) = iDistance; // /4
-						ang(0, Index) = (double)iAngle; // * -0.000136353
+						ang(0, Index) = (double)iAngle * -1; // * -0.000136353
 						Index++;
 						if (Index == 500){
 							Array_full_flag = 1;

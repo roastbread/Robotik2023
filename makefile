@@ -1,9 +1,9 @@
 
 #Set all your object files (the object files of all the .c files in your project, e.g. main.o my_sub_functions.o )
-OBJ = main.o motors.o runCv.o lidar.o coxRemade.o 
+OBJ = main.o motors.o runCv.o lidar.o coxRemade.o kalman.o
  
 #Set any dependant header files so that if they are edited they cause a complete re-compile (e.g. main.h some_subfunctions.h some_definitions_file.h ), or leave blank
-DEPS =  runCv.h lidar.h coxRemade.h motors.h spi_com.h
+DEPS =  runCv.h lidar.h coxRemade.h motors.h spi_com.h kalman.h
 
 #Any special libraries you are using in your project (e.g. -lbcm2835 -lrt `pkg-config --libs gtk+-3.0` ), or leave blank
 LIBS = `pkg-config --libs opencv` -lrobotic_gcc -lraspicam -lraspicam_cv -lmmal -lmmal_core -lmmal_util -lopencv_core -lopencv_highgui -lwiringPi -L/opt/vc/lib

@@ -23,8 +23,13 @@ using namespace cv;
 using namespace std;
 
 extern int boxPos;
+extern int trueD;
+
+void showFrame();
 
 int toMain(void);
+
+bool boxEval(int counts);
 
 void camMain(void);
 

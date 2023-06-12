@@ -22,8 +22,16 @@
 
 
 extern Eigen::Vector3d posFix;
-extern Eigen::MatrixXd covariance;
+extern Eigen::MatrixXd covarianceFix;
 extern bool coxDone;
+
+
+void setup();
+
+void gather_data();
+
+void loop(int maxIterations, float prevX, float prevY, float prevA);
+
 
 int coxMain(void);
 
